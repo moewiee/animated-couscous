@@ -25,21 +25,21 @@ def valid_model(_print, cfg, model, valid_loader,
         for i, (image, lb) in enumerate(tbar):
             image = image.cuda()
             lb = lb.cuda()
-            w_output = torch.nn.functional.softmax(model(image), 1)
+            w_output = model(image)
 
             preds.append(w_output.cpu())
             targets.append(lb.cpu())
 
     preds, targets = torch.cat(preds, 0), torch.cat(targets, 0)
     # record
-    val_loss = torch.nn.functional.cross_entropy(preds, targets)
-    score = accuracy_score(targets, torch.argmax(preds, 1))
+    val_loss = torch.nn.functional.binary_cross_entropy_with_logits(preds, targets)
+    score = accuracy_score(targets, (preds.numpy() > 0.5).astype(int))
 
     _print("VAL LOSS: %.5f, SCORE: %.5f"  % (val_loss, score))
     # checkpoint
     if checkpoint:
-        is_best = score < best_metric
-        best_metric = min(score, best_metric)
+        is_best = val_loss < best_metric
+        best_metric = min(val_loss, best_metric)
         save_dict = {"epoch": epoch + 1,
                      "arch": cfg.EXP,
                      "state_dict": model.state_dict(),
@@ -48,7 +48,7 @@ def valid_model(_print, cfg, model, valid_loader,
         if is_best: # only save best checkpoint, no need resume
             save_checkpoint(save_dict, is_best,
                             root=cfg.DIRS.WEIGHTS, filename=save_filename)
-        return score, best_metric
+        return val_loss, best_metric
 
 
 def test_model(cfg, args, model, test_loader):
@@ -96,7 +96,6 @@ def train_loop(_print, cfg, model, train_loader,
             image = cutmix_data(image, alpha=cfg.DATA.CM_ALPHA)
         w_output = model(image)
         # compute loss
-        # loss = criterion(w_output[:,0], leaf_target) + criterion(w_output[:,1], stem_target) + criterion(w_output[:,2], healthy_target)
         loss = criterion(w_output, target)
         # gradient accumulation
         loss = loss / cfg.OPT.GD_STEPS

@@ -202,11 +202,11 @@ class WDataset(Dataset):
 
     def __getitem__(self, idx):
         if self.mode != "test":
-            lb = self.label[idx]
+            lb = self.label[idx].astype(np.float32)
+            lb = torch.Tensor([lb])
         image = Image.open(os.path.join(self.dir, self.images[idx] + ".jpg")).convert("RGB")
+        image = image.resize(self.size)
         if self.mode == "train":
-            image = self.resize_crop(image)
-            # image = image.resize(self.size)
             if self.grid_mask:
                 image = np.array(image)
                 image = self.grid_mask(image=image)
@@ -228,10 +228,8 @@ class WDataset(Dataset):
                 aug2 = to_tensor(aug2)
                 return (image, aug1, aug2), grapheme_root, consonant_diacritic, vowel_diacritic
         elif self.mode == "valid":
-            image = image.resize(self.size)
             image = to_tensor(image)
             return image, lb
         else:
-            image = image.resize(self.size)
             image = to_tensor(image)
             return image, self.images[idx]

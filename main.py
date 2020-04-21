@@ -66,7 +66,7 @@ def main(args, cfg):
 
     # Define loss
     if cfg.LOSS.NAME == "ce":
-        train_criterion = nn.CrossEntropyLoss()
+        train_criterion = nn.BCEWithLogitsLoss()
     elif cfg.LOSS.NAME == "focal":
         train_criterion = SoftmaxFocalLoss(
             gamma=cfg.LOSS.GAMMA)

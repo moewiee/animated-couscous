@@ -72,7 +72,7 @@ _C.MODEL.POOL_TYPE = "avg" # Global pooling type. One of 'avg', 'max', 'avgmax',
 _C.MODEL.DROPOUT = 0.3
 _C.MODEL.DROP_CONNECT = 0.2
 _C.MODEL.CLS_HEAD = 'linear'
-_C.MODEL.NUM_CLASSES = 2
+_C.MODEL.NUM_CLASSES = 1
 
 _C.CONST = CN()
 
