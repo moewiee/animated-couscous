@@ -1,0 +1,31 @@
+EXP: 'resnext50'
+
+DIRS:
+  TRAIN_IMAGES: "/media/datnt/data/saras-esad/"
+  VALIDATION_IMAGES: "/media/datnt/data/saras-esad/"
+
+DATA:
+  TRAIN_CSV_FILE: "/media/datnt/data/saras-esad/train_actions_binary.csv"
+  VALIDATION_CSV_FILE: "/media/datnt/data/saras-esad/valid_actions_binary.csv"
+  RANDAUG:
+    N: 2
+    M: 27
+  IMG_SIZE: 224
+
+MODEL:
+  NAME: "swsl_resnext50_32x4d"
+  ACTIVATION: "relu"
+  DROPOUT: 0.0
+  CLS_HEAD: "linear"
+
+LOSS:
+  NAME: "ce"
+
+OPT:
+  BASE_LR: 4e-3
+  WARMUP_EPOCHS: 3
+  GD_STEPS: 1
+
+TRAIN:
+  BATCH_SIZE: 128
+  EPOCHS: 30
